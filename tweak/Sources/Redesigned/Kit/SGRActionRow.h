@@ -39,15 +39,25 @@
 // colour while it is on). Set it for a glyph whose colour is only the weight Spotify gave the control it
 // sat in: Encore bakes the colour into the image it draws, so this re-renders the copy as a template.
 @property (nonatomic, copy) UIColor *glyphColor;
-// The word on Spotify's button instead of a glyph, in a glass capsule as wide as the word asks for: for a
-// text button such as the artist's Follow, whose word is its state ("Follow", "Following") in the app's
-// language. Until Spotify's button has a word, the fallback glyph is drawn in the round shape instead. Set
-// before the first -feedFrom:.
-@property (nonatomic) BOOL showsWord;
-// The width the button wants: SGRActionHeight for a glyph, the word and its padding for a word.
-- (CGFloat)sgr_width;
+// The colour the glyph takes while Spotify's button is on, and glyphColor while it is off, for a button that
+// says it is on with the small dot Encore puts under its glyph (shuffle: trees/continuous/1.txt, a 4pt round
+// view, hidden while off). Spotify's own off grey read as a disabled button beside the white download
+// (issue #65). A button with no such dot keeps Spotify's colours. nil, the default, reads no dot.
+@property (nonatomic, copy) UIColor *onGlyphColor;
+// For a button that shows its state only as a word in the app's language (the artist's Follow): YES with
+// whether it is on once the state is known, from wherever the page reads it. The button then draws
+// stateOffSymbol, or stateOnSymbol in the accent colour, and nothing while it answers NO. Set before the
+// first -feedFrom:; call -feedFrom: again when the state changes.
+@property (nonatomic, copy) BOOL (^readState)(BOOL *on);
+@property (nonatomic, copy) NSString *stateOffSymbol;
+@property (nonatomic, copy) NSString *stateOnSymbol;
 // Takes the glyph, its colour and the label from `source`, and follows the glyph as Spotify swaps it
 // (shuffle turning on). Cheap to call again on every pass.
+//
+// Spotify's download button (SGRDownload.h) is drawn by Lottie, with nothing to copy: for it the button
+// draws the state Spotify reports instead -- the arrow, a ring filling up, the downloaded glyph -- and reads
+// it again while it is on screen, twice a second while a download runs, since nothing Spotify does then
+// lays out anything the page hears. So is the add-to button, drawn as a plus or, saved, a checkmark.
 - (void)feedFrom:(UIView *)source;
 @end
 
